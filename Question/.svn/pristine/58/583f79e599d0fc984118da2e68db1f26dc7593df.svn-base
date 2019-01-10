@@ -1,0 +1,65 @@
+﻿@using QuestionnaireSys.Model;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section link{
+    <style type="text/css">
+        .QuestionnaireName { text-align:center; font-size:15px; font-weight:bold;}
+        .TeacherSuggest font{ position:absolute; right:20px;}
+    </style>
+}
+
+<table id="table" class="table table-bordered table-condensed table-striped table-hover">
+    <thead>
+        <tr>
+            <th>我的建议与老师的回复</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (StudentAnswer Question in ViewBag.Answer)
+        {
+            <tr>
+                <td>
+                    <div class="QuestionnaireName">@Question.Questionnaire.QuestionnaireName</div>
+                    <div class="QuestionMySuggest">我的意见：@Question.Suggest</div>
+                    <div class="TeacherSuggest">
+                        @if (Question.TeacherSuggest != null)
+                        {
+                            <span>老师建议：@Question.TeacherSuggest</span>
+                            <font color="red"> @Question.AdminUser.UserName</font> 
+                        }
+                        else
+                        {
+                            <span>老师暂无做出任何建议！</span>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@section script{
+    @*<script type="text/javascript" src="~/Script/jquery-1.10.2.min.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+            $("#navbar ul li").removeClass("ButtomSolid");
+            $("#navbar ul li:eq(2)").attr("class", "ButtomSolid");
+
+            $("#table").bootstrapTable({
+                pagination: true,
+                pageNumber: 1,
+                pageSize: 5,
+                pageList: [10, 30, 50],
+                search: true
+            });
+        })
+
+
+    </script>
+}

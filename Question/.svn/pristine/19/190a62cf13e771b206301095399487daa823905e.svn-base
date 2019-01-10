@@ -1,0 +1,303 @@
+﻿@using QuestionnaireSys.Web.Models
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section link{
+    <style type="text/css">
+        #QuestionId { display:none;}
+        #navbar ul li { position:relative; top:10px;}
+        #QuestionBox {  width:99%;}
+        #Main>#QuestionBox { margin:0px auto; margin-top:5px; height:535px;}
+        #Question { border:1px solid blue; height:200px; position:relative; font-size:25px; word-wrap:break-word;}
+        #QuestionItemContext { border:1px solid yellow;}
+        #QuestionItemContext ol li{ padding:5px 5px;}
+        #QuestionItem {  border:1px solid red; height:35px; border-bottom-left-radius:10px; border-bottom-right-radius:10px; line-height:35px;}
+        #QuestionItem span { padding-left:15px;}
+        #BtnTop { display:none;}
+        #BtnTopBtom { text-align:center; position:absolute; top:550px; width:100%;}
+        #suggest {display:none; width:99%; margin:0px auto;}
+        #suggest textarea { width:100%;  height:300px; }
+        #BtnTopBtom span { display:inline-block; margin:0px 5px;}
+        #suggestContext { resize:none; margin-top:5px;}
+        #suggest > div { font-size:25px; margin-top:10px;}
+        #QuestionInfo { border:1px solid red; height:35px; border-top-right-radius:10px; border-top-left-radius:10px; line-height:35px;}
+        #QuestionInfo>div {  font-family:"微软雅黑"; float:left;}
+        #QuestionInfo>div font { font-weight:bold;}
+        .progress { width:50%; height:32px;}
+        #jdt { margin-left:30%;}
+        .progress {margin-bottom:0px;}
+    </style>
+}
+                <div id="QuestionBox">
+                <div id="QuestionId"></div>
+                <div id="QuestionInfo">
+                    <div></div>
+                        <div id="jdt">已完成：</div>
+                        <div class="progress">
+                            <div id="progressNumber" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+                                0%
+                            </div>
+                        </div>
+                    
+                </div>
+                <div Id="Question"></div>
+                        <div id="QuestionItemContext">
+                            <ol type="A">
+                                <li>@ViewBag.MatterItems.AnswerA</li>
+                                <li>@ViewBag.MatterItems.AnswerB</li>
+                                <li>@ViewBag.MatterItems.AnswerC</li>
+                                @if (ViewBag.MatterItems.AnswerD != null)
+                                {
+                                    <li>@ViewBag.MatterItems.AnswerD</li>
+                                }
+                            </ol>
+                        </div>
+
+                        <div id="QuestionItem">
+                            <span>你的选择：</span>
+                            <span>A：<input name="Question" value="@ViewBag.MatterItems.AnswerA" type="radio" /></span>
+                            <span>B：<input name="Question" value="@ViewBag.MatterItems.AnswerB" type="radio" /></span>
+                            <span>C：<input name="Question" value="@ViewBag.MatterItems.AnswerC" type="radio" /></span>
+                            @if (ViewBag.MatterItems.AnswerD != null)
+                            {
+                                <span>D：<input name="Question" value="@ViewBag.MatterItems.AnswerD" type="radio" /></span>
+                            }
+                        </div>
+                 </div>
+                
+                <div id="suggest">
+                    <div>请提出你的意见！</div>
+                    <textarea id="suggestContext"></textarea>
+                </div>
+
+                    <div id="BtnTopBtom">
+                        <center>
+                            <span><input type="button" id="BtnTop" class="btn btn-success" value="上一题" /></span>
+                            <span><input type="button" id="Btnbottom" class="btn btn-default" value="下一题" /></span>
+                        </center>
+                    </div>
+                
+            
+    
+@section script{
+    <script type="text/javascript" src="~/Script/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript">
+        var arr=[];
+        var Questionlength=0;
+        var Index=0;
+        var Answer=[];
+        var jdt=0;
+        var progress=0;
+
+        $(function () {
+            $("#userInfo h6").text("本场问卷类型为：@ViewBag.QuestionnaireTypeName");
+            $("#userInfo").append("<h6>问卷名称：@ViewBag.QuestionnaireName</h6>");
+            $("#navbar ul li").remove();
+            $("#navbar ul").append("<li id='btnExit' class='btn btn-danger'>退出</li>")
+
+            $("#btnExit").click(function () {
+                layer.confirm('你确定退出本场问卷吗？', {
+                    btn: ['确定','取消'] //按钮
+                }, function(){
+                    location.href="/";
+                });
+
+            })
+
+            $.get("/QuestionSurvey/GetQuestion", ({Id:@ViewBag.Id}),function(data){
+                for(var i=0;i<data.length;i++)
+                {
+                    Questionlength=data.length;
+                    arr[i]=data["data"][i]["Id"]+","+data["data"][i]["Context"]+","+data["data"][i]["AnswerOptionContext"]+","+eval(i + 1);
+                    if(data["data"][i]["AnswerOptionContext"]!=null)
+                    {
+                        
+                        $("#BtnTop").css("display","block");
+                        Index= i+1;
+                        if(Index>=Questionlength)
+                        {
+                            $("#QuestionBox").css("display","none")
+                            $("#suggest").css("display","block")
+                            $("#Btnbottom").val("提交").removeClass("btn-default").attr("class","btn btn-danger");
+                        }
+                        progress++;
+                    }
+                }
+                if(progress!=0)
+                {
+                    layer.alert("继续上次未完成的问题！",{
+                        icon: 6,
+                        tiem:1000
+                    })
+                }
+                QuestionContext(Index);
+                    
+            },"json")
+
+
+            $("#BtnTop").click(function(){
+
+                Index--;
+                if(Index<=0)
+                {
+                    $("#BtnTop").css("display","none");
+                }
+
+                if(Index<Questionlength)
+                {
+                    $("#QuestionBox").css("display","block")
+                    $("#suggest").css("display","none")
+                    $("#Btnbottom").val("下一题").removeClass("btn-danger").attr("class","btn btn-default");
+                }
+                
+
+                if(Index<0)
+                {
+                    Index=0;
+                }
+
+                QuestionContext(Index);
+                $("#QuestionItem span input").each(function(index,value){
+                    var $this=$(value);
+                    if(Answer[Index]==$this.val())
+                    {
+                        value.checked=true;
+                    }
+                })
+
+            })
+
+            
+            $("#Btnbottom").click(function(){
+                if(Index>=Questionlength)
+                {
+                    var suggestContext=$("#suggestContext").val();
+                    if(suggestContext!="")
+                    {
+                        if(suggestContext.length>=20 && suggestContext.length<=1000)
+                        {
+                            $.get("/QuestionSurvey/InsertSuggest",({suggest:suggestContext,QuestionnaireId:@ViewBag.Id}),function(data){
+                                    if(data.success)
+                                {
+                                        layer.msg(data.Message,{
+                                            tiem:3000
+                                        })
+                                        location.href="/";
+                                }
+                                    else
+                                {
+                                        //alert(data.Message);
+                                        layer.alert(data.Message,{
+                                            tiem:1000
+                                        })
+                                }
+                            },"json")
+                        }
+                            else
+                        {
+                            layer.alert("建议字符长度不得小于20字！",{
+                                tiem:2000
+                            })
+                        }
+                    }
+                    else
+                    {
+                        layer.alert("建议填写不允许为空！",{
+                            tiem:2000
+                        })
+                    }
+                }
+                else
+                {
+                    var context=$("#QuestionItem span").find("input[type=radio]:checked").val();
+                    if($("#QuestionItem span").find("input[type=radio]:checked").length>0)
+                    {  
+                        $.get("/QuestionSurvey/InsetAnswerDetail",({QuestionnaireId:@ViewBag.Id,QuestionId:$("#QuestionId").text(),QuestionContext:context}),
+                          function(data){
+                              if(data.success)
+                              {
+                                  if(data.query==1)
+                                  {
+                                      progress++;
+                                  }
+
+                                  Answer[Index] = context;
+                                  Index++; 
+                                  
+                                  if(Index!=0)
+                                  {
+                                      $("#BtnTop").css("display","block");
+                                  }
+
+                                  if(Index>=Questionlength)
+                                  {
+                                      Index=Questionlength;
+                                      $("#QuestionBox").css("display","none")
+                                      $("#suggest").css("display","block")
+                                      $("#Btnbottom").val("提交").removeClass("btn-default").attr("class","btn btn-danger");
+                                  }
+                              
+                                  QuestionContext(Index);
+
+                                  $("#QuestionItem span input").each(function(index,value){
+                                      var $this=$(value);
+                                      if(Answer[Index]==$this.val())
+                                      {
+                                          value.checked=true;
+                                      }
+                                  })
+                              }
+                              else
+                              {
+                                  layer.alert(data,{
+                                      time:2000
+                                  })
+                              }
+                          },"json")
+                    }
+                    else
+                    {
+                        layer.alert("请完成这题的问答！",{
+                            time:2000
+                        })
+                    }
+                }
+                
+            })
+
+        })
+
+
+
+        function QuestionContext(index)
+        {
+            $("#QuestionItem span input").each(function(index,value){
+                    value.checked=false;
+            })
+
+            var arr1=[];
+            var str=arr[index];
+            arr1=str.split(",");
+            $("#progressNumber").text(eval((progress/Questionlength)*100)+"%");
+            $("#progressNumber").css("width",eval((progress/Questionlength)*100)+"%")
+            $("#Question").text(arr1[1]);
+            $("#QuestionId").text(arr1[0]);
+            $("#QuestionInfo").find("div").eq(0).empty();
+            $("#QuestionInfo").find("div").eq(0).append("共<font color='red'>"+Questionlength+"题</font>，当前第<font color='red'>"+arr1[3]+"</font>题");
+            if(arr1[2]!=null)
+            {
+                $("#QuestionItem span input").each(function(index,value){
+                    var $this=$(value);
+                    if(arr1[2]==$this.val())
+                    {
+                        value.checked=true;
+                    }
+                })
+            }
+        }
+
+    </script>
+}
+

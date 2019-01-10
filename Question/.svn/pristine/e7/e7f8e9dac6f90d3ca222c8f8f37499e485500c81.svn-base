@@ -1,0 +1,52 @@
+﻿@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "UpdataRole";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<UserRole> RoleName = work.Repository<UserRole>().GetList().ToList();
+}
+
+<div class="page-container">
+    <form action="" method="post" class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;&emsp;角色名称：</label>
+            <div class="formControls col-xs-6 col-sm-2">
+                <input type="text" class="input-text" value="@ViewBag.UserRole.RoleName" placeholder="请输入角色名称" id="RoleName" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-6 col-sm-2 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="btnSava()"*@ id="btnUpdata" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 修改</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#btnUpdata").click(function () {
+                var Id=@ViewBag.Id;
+                var name = $("#RoleName").val();
+                if (name=="") {
+                    layer.msg("角色信息不能为空！");
+                }
+                else{
+                    $.post("/admin/Role/UpdataRole", ({id:Id, RoleName: name }),
+                        function (data) {
+                            if (data.success) {
+                                layer.msg("修改成功！", { icon: 1 }, { icon: 1 }, setTimeout(function () {
+                                    parent.location.reload();
+                                }, 2000))
+                            } else {
+                                layer.msg("修改失败", { icon: 2, time: 2000 });
+                            }
+                        }, "json")
+                }
+            })
+        })
+    </script>
+}
+

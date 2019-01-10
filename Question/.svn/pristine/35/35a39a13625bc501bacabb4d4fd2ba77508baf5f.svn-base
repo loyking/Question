@@ -1,0 +1,116 @@
+﻿@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "UpdataStudentInfo";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<Classe> className = work.Repository<Classe>().GetList().ToList();
+}
+
+<div class="page-container">
+    <form id="addForm" action="" method="post" class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">学生姓名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="@ViewBag.Student.StudentName" placeholder="请输入学生姓名" id="stuName" name="stuName">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">联系方式：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="@ViewBag.Student.Mobile" placeholder="请输入学生的联系方式" id="stuMoble" name="stuMoble">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">身份证号码：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" title="身份证不可修改，谢谢合作！" readonly="readonly" value="@ViewBag.Student.CardId" placeholder="请输入学的身份证号码" id="stuCardId" name="stuCardId">
+            </div>
+        </div>
+        @*<div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">登陆密码：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="请输入学生的登录密码" id="stuPwd" name="">
+            </div>
+        </div>*@
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">班级：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select name="" id="select" class="select">
+                        <option value="@ViewBag.Classe.Id">@ViewBag.Classe.ClasseName</option>
+                        @foreach (var item in className)
+                        {
+                            if (item.ClasseName != @ViewBag.Classe.ClasseName)
+                            {
+                                <option value="@item.Id">@item.ClasseName</option>
+                            }
+
+
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="btnSava()"*@ id="btnUpdate" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 修改</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+<script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+<script src="~/Areas/admin/Script/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#btnUpdata").click(function () {
+           
+
+            var Id= @ViewBag.Id;
+            var name = $("#stuName").val();
+            var moble = $("#stuMoble").val();
+            var cardId = $("#stuCardId").val();
+            //var pwd = $("#stuPwd").val();
+            var classId = $("#select").val();
+            if (name == "")
+            {
+                layer.msg("学生姓名不能为空！");
+            }
+            else if (moble == "") {
+                layer.msg("学生联系电话不能为空！");
+            }
+            else if (moble.length < 11 || moble.length > 11) {
+                layer.msg("学生联系电话长度输入不正确！");
+            } 
+            else if(cardId == "") {
+                layer.msg("学生身份证不能为空！");
+            }
+            else if (cardId.length < 18 || cardId.length > 18) {
+                layer.msg("学生身份证号码长度输入不正确！");
+            }
+            else {
+                $.post("/admin/StudentInfo/UpdataStudentInfo", { id:Id,stuName: name,moble: moble,cardId: cardId,classId: classId },
+                    function (data) {
+                        if (data.success) {
+                            layer.msg(data.message, { icon: 1 }, setTimeout(function () {
+                                //layer_close();
+                                parent.location.reload();
+                                //location = location;
+                            }, 500))
+                        }
+                        else {
+                            layer.msg(data.message, { icon: 2, time: 500 });
+                        }
+                    }, "json")
+            }
+
+
+
+
+        })
+    })
+</script>
+}
+

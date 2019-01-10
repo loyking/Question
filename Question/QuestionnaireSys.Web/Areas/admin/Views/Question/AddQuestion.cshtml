@@ -1,0 +1,72 @@
+﻿@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "AddQuestion";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<Questionnaire> QuestionnaireTypes = work.Repository<Questionnaire>().GetList().ToList();
+}
+
+<title>添加问题详情</title>
+<div class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-article-add">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">所属问卷：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select name="" id="select" class="select">
+                        @foreach (var item in QuestionnaireTypes)
+                        {
+                            <option value="@item.Id">@item.QuestionnaireName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">问题内容：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="请输入问题内容" id="context" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="article_save();"*@ id="btnSava" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        $("#btnSava").click(function () {
+            //var classId = $("#select").find("option").eq($("#select").first().val()-1).val();
+            var classId = $("#select").val();
+            var context = $("#context").val();
+            //alert(classId);
+            if (context == "") {
+                layer.msg("问题内容不能为空！");
+            }
+            else {
+                $.post("/admin/Question/AddQuestion", ({ questionnaireId: classId, context: context }), function (data) {
+                    if (data.success) {
+                        //alert(data.message);
+                        //location = location;
+                        layer.msg(data.message, { icon: 1 }, setTimeout(function () {
+                            parent.location.reload();
+                        }, 500))
+                    } else {
+                        layer.msg(data.message, { icon: 2 }, setTimeout(function () {
+                            //location = location;
+                            //parent.location.reload();
+                        }, 500))
+                    }
+                }, "json")
+            }
+        })
+    })
+
+    </script>
+}

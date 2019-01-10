@@ -1,0 +1,89 @@
+﻿@using QuestionnaireSys.Web.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section link{
+    <style type="text/css">
+      
+        
+        #table { width:99%; margin:0px auto; margin-top:5px;}
+        .QuestionInfoBox > span { display:inline-block; padding:15px 0px; width:180px; text-align:center;}
+        .QuestionTitle { font-weight:bold;}
+        .QuestionInfoBox>span:first-child{ display:none;}
+    </style>
+}
+    
+                @if (ViewBag.QuestionInfo != null)
+                {
+                    <table id="table" class="table table-bordered table-condensed table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>问卷信息<font color="red">（未作答的问卷日期为问卷发表日期,，其他日期则为作答日期）</font></th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <div class="QuestionInfoBox QuestionTitle">
+                                        <span>问卷ID</span>
+                                        <span>问卷类型名称</span>
+                                        <span>问卷名称</span>
+                                        <span>问卷发表者名字</span>
+                                        <span>问卷时间</span>
+                                        <span>问卷状态</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            @foreach (QuestionInfo Question in ViewBag.QuestionInfo)
+                            {
+
+                                <tr>
+                                    <td>
+                                        <div class="QuestionInfoBox">
+                                            <span></span>
+                                            <span>@Question.QuestionnaireTypeName</span>
+                                            <span>@Question.QuestionnaireName</span>
+                                            <span>@Question.UserName</span>
+                                            <span>@Question.CreateDate</span>
+                                            <span class="QuestionState">@Question.state</span>
+                                            @if (Question.state == "未完成")
+                                            {
+                                                <span><a href="/QuestionSurvey?Id=@Question.Id"><input type="button" value="继续问答" class="btn btn-danger" /></a></span>
+                                            }
+                                            else
+                                            {
+                                                <span><a href="/QuestionSurvey?Id=@Question.Id"><input type="button" value="开始问答" class="btn btn-primary" /></a></span>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <h3>暂无要完成的调查问卷！</h3>
+                }
+
+
+@section script{
+    @*<script type="text/javascript" src="~/Script/jquery-1.10.2.min.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+
+            $("#table").bootstrapTable({
+                pagination: true,
+                pageNumber:1,
+                pageSize: 5,
+                pageList: [10, 30, 50],
+                search: true
+            });
+        })
+
+
+    </script>
+}

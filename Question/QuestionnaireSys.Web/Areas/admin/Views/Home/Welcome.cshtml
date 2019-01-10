@@ -1,0 +1,29 @@
+﻿
+@{
+    ViewBag.Title = "Welcome";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+}
+@section styles{
+<link href="~/Areas/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+<style type="text/css">
+    .WelcomeTitle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+
+    h1 {
+        font-size: 3.5vw;
+    }
+</style>
+}
+<title>后台界面首页</title>
+<div class="WelcomeTitle">
+    <h1>欢迎来到问卷后台管理系统！</h1>
+</div>
+@section scripts{
+<script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+<script src="~/Areas/Content/bootstrap/bootstrap.min.js"></script>
+}
+

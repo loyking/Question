@@ -1,0 +1,66 @@
+﻿@using QuestionnaireSys.Web.Models;
+@{
+    ViewBag.Title = "AnswerDetail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section link{
+    <style type="text/css">
+        #btnExit { position:relative; top:10px;}
+        #AnswerDetailBox {  width:99.5%; margin:0px auto; margin-top:5px;}
+        .AnswerDetailTitle { border:2px dashed red;}
+        .AnswerDetaiContext { border-bottom:2px dashed blue; width:96.5%; margin:0px auto; padding:5px 0px;}
+        .MatterItemBox { margin-top:5px;}
+        .AnswerOptionContext { border:1px #ddd solid; background-color:#f4f4f4; height:40px; line-height:40px; margin:10px 0px; padding-left:20px;}
+        #SuggestInfo { border:2px dashed black; border-radius:5px; height:230px;}
+        #stuSuggest { border-bottom:2px dashed black; padding:10px 0px;}
+        #teacherBox { margin-top:10px;}
+        #teacherName { position:absolute; right:30px;}
+    </style>
+}
+<div id="AnswerDetailBox">
+    @foreach (AnswerDetail item in ViewBag.AnswerDetail)
+    {
+        <div class="AnswerDetailTitle">
+            <div class="AnswerDetaiContext">第 @item.number 题：@item.Context</div>
+            <div class="MatterItemBox">
+                <ol type="A">
+                    <li>@ViewBag.MatterItem.AnswerA</li>
+                    <li>@ViewBag.MatterItem.AnswerB</li>
+                    <li>@ViewBag.MatterItem.AnswerC</li>
+                    @if (ViewBag.MatterItem.AnswerD != null)
+                {
+                        <li>@ViewBag.MatterItem.AnswerD</li>
+                    }
+                </ol>
+            </div>
+        </div>
+        <div class="AnswerOptionContext">你的选项：@item.AnswerOptionContext</div>
+    }
+
+    <div id="SuggestInfo">
+        <div id="stuSuggest">你的建议：@ViewBag.StudentSuggest</div>
+        <div>
+            <div id="teacherBox">
+                <div id="teacherSuggest">老师给予你的回复：@ViewBag.AdminSuggest</div>
+                <div id="teacherName">老师：<font color="red">@ViewBag.AdminName</font></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section script{
+    @*<script src="~/Script/jquery-1.10.2.min.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+            var QuestionCount = "@ViewBag.QuestionCount";
+            var MainHeight = eval(QuestionCount * 172 + 330);
+            
+            $("#Main").css("height", MainHeight + 'px');
+            $("#navbar ul li").remove();
+            $("#navbar ul").append("<a href='/MyQuestionnaire'><li id='btnExit' class='btn btn-danger'>退出</li></a>")
+            $("#userInfo h6").text("问卷名称：@ViewBag.QuestionName");
+        })
+    </script>
+   
+}

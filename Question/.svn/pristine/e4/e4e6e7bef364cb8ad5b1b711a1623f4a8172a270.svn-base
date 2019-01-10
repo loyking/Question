@@ -1,0 +1,77 @@
+﻿@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "AddQuestionnaireType";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<QuestionnaireType> qt = work.Repository<QuestionnaireType>().GetList().ToList();
+    List<UserRole> role = work.Repository<UserRole>().GetList().ToList();
+    }
+
+<div class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-article-add">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">问卷类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="请输入你要添加的类型" id="QuestionnaireType" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">所属角色：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select name="" id="select" class="select">
+                        @foreach (var item in role)
+{
+                            <option value="@item.Id">@item.RoleName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="article_save();"*@ id="btnSava" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#btnSava").click(function () {
+                var a 
+            var name = $("#QuestionnaireType").val();
+            //var userRoleId = $("#select").find("option").eq($("#select").first().val() - 1).val();
+            var userRoleId = $("#select").val();
+            //alert(userRoleId);
+            if (name == "") {
+                layer.msg("问卷类型不能为空！");
+            }
+            else {
+                $.post("/admin/QuestionnaireType/AddType", ({ questionnaireType: name, userRoleId: userRoleId }), function (data) {
+                    if (data.success) {
+                        //alert(data.message);
+                        layer.msg(data.message, { icon: 1 }, setTimeout(function () {
+                            //layer_close();
+                            parent.location.reload();
+                            //location = location;
+                        }, 500))
+                    }
+                    else {
+                        layer.msg(data.message, { icon: 2, time: 500 });
+                    }
+                }, "json")
+            }
+        })
+    })
+
+    function layer_close() {
+        var index = parent.layer.getFrameIndex(window.name);
+        parent.layer.close(index);
+    }
+
+    </script>
+}

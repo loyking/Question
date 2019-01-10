@@ -1,0 +1,185 @@
+﻿@using QuestionnaireSys.Model;
+@{
+    ViewBag.Title = "Cartogram";
+    Layout = "/Areas/admin/Views/Shared/_Layout.cshtml";
+}
+
+@section styles{
+    <style type="text/css">
+        #main {
+            width: 50%;
+            height: 500px;
+            margin: 0px auto;
+        }
+        #QuestionnaireInfo {
+            font-weight: bold;
+            color:red;
+            position:absolute;
+            font-size:25px;
+        }
+        #Box { width:100%; height:500px;}
+        #StatisticsQuestion { width:11%; height:50px; text-align:center; position:absolute; top:200px; left:50px; border:1px solid red; border-radius:5px;}
+    </style>
+}
+
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 学员管理 <span class="c-gray en">&gt;</span> 学生回答统计 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="text-c">
+        @*<input type="text" id="" placeholder="请输您所输入的内容" style="width:250px" class="input-text">
+            <button name="" id="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>*@
+    </div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span>班级：</span>
+        <select id="JxClass">
+            <option id="titleClass">--请选择--</option>
+            @foreach (Classe item in ViewBag.JxClassInfo)
+            {
+                <option value="@item.Id">@item.ClasseName</option>
+            }
+        </select>
+        <span>问卷：</span>
+        <select id="QuestionnaireName">
+            <option>--请选择--</option>
+        </select>
+    </div>
+    <div id="QuestionnaireInfo"></div>
+
+    <div id="Box">
+    </div>
+
+</div>
+
+@section scripts{
+    @*<script type="text/javascript" src="/Script/jquery-1.10.2.min.js"></script>*@
+    @*<script type="text/javascript" src="/Script/Bootstrap/bootstrap.min.js"></script>*@
+    <script type="text/javascript" src="/Script/echarts.js"></script>
+    <script type="text/javascript">
+
+        $(function () {
+
+            $("#JxClass").change(function () {
+                
+                $("#QuestionnaireInfo").text("");
+                $("#QuestionnaireName").find("option").remove();
+                $("#JxClass").find("option[id=titleClass]").remove();
+                JxClassId($("#JxClass").val())
+            })
+
+            $("#QuestionnaireName").change(function () {
+                GetStatisticsQuestion($("#JxClass").val(), $("#QuestionnaireName").val())
+            })
+
+        })
+
+        function JxClassId(id) {
+            $.get("/StudentInfo/QuestionnaireInfo", { id: id }, function (data) {
+                if (data.success)
+                {
+                    for (var i = 0; i < data.length; i++)
+                    {
+                        $("#QuestionnaireName").append('<option value=' + data["data"][i]["Id"] + '>' + data["data"][i]["QuestionnaireName"] + '</option>')
+                    }
+                    GetStatisticsQuestion($("#JxClass").val(), $("#QuestionnaireName").val())
+                }
+                else
+                {
+                    $("#Box>div").remove();
+                    $("#QuestionnaireName").append('<option>' + data.Message + '</option>')
+                }
+            }, "json")
+        }
+
+
+
+        function GetStatisticsQuestion(JxClassId, QuestionId) {
+            $.get("/StudentInfo/StatisticsQuestionInfo", { JxClassId: JxClassId, QuestionId: QuestionId }, function (data) {
+                if (data.success) {
+                    $("#Box").append("<div id='main'></div>")
+                    $("#Box").append("<div id='StatisticsQuestion'></div>")
+                    $("#StatisticsQuestion").append("<div id='ClassSum'></div>")
+                    $("#StatisticsQuestion").append("<div id='QuestionSum'></div>")
+
+                    var myChart = echarts.init(document.getElementById('main'));
+                    var JxClassName = $("#JxClass").find("option[value=" + JxClassId + "]").text();
+                    var QuestionnaireName = $("#QuestionnaireName").find("option[value=" + QuestionId + "]").text();
+                    $("#QuestionnaireInfo").text(JxClassName + " " + QuestionnaireName + " 问卷")
+                    $("#ClassSum").text("该班级总人数："+data.ClassSumNumber)
+                    $("#QuestionSum").text("已回答人数：" + data.finishSumNumber)
+
+
+                    var option = {
+                        color: ['#003366', '#006699', '#4cabce', '#e5323e'],
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        legend: {
+                            data: ['' + data.MatterItems.AnswerA + '', '' + data.MatterItems.AnswerB + '', '' + data.MatterItems.AnswerC + '', '' + data.MatterItems.AnswerD + '']
+                        },
+                        toolbox: {
+                            show: true,
+                            orient: 'vertical',
+                            left: 'right',
+                            top: 'center',
+                            feature: {
+                                mark: { show: true },
+                                dataView: { show: true, readOnly: false },
+                                magicType: { show: true, type: ['line', 'bar', 'stack', 'tiled'] },
+                                restore: { show: true },
+                                saveAsImage: { show: true }
+                            }
+                        },
+                        calculable: true,
+                        xAxis: [
+                            {
+                                type: 'category',
+                                axisTick: { show: false },
+                                data: data.Context
+                            }
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value'
+                            }
+                        ],
+                        series: [
+                            {
+                                name: '' + data.MatterItems.AnswerA + '',
+                                type: 'bar',
+                                barGap: 0,
+                                data: data.AnswerA
+                            },
+                            {
+                                name: '' + data.MatterItems.AnswerB + '',
+                                type: 'bar',
+                                data: data.AnswerB
+                            },
+                            {
+                                name: '' + data.MatterItems.AnswerC + '',
+                                type: 'bar',
+                                data: data.AnswerC
+                            },
+                            {
+                                name: '' + data.MatterItems.AnswerD + '',
+                                type: 'bar',
+                                data: data.AnswerD
+                            }
+                        ]
+                    };
+                    myChart.setOption(option);
+                } else
+                {
+                    $("#Box>div").remove();
+                    $("#QuestionnaireInfo").text(data.Message)
+                }
+            }, "json")
+        }
+
+
+    </script>
+}
+
+

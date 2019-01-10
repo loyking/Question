@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+}
+
+<title>问题详情管理</title>
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 问卷管理 <span class="c-gray en">&gt;</span> 问题详情管理 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="page-container">
+    <div class="text-c">
+        @*<input type="text" id="" placeholder="请输您所输入的内容" style="width:250px" class="input-text">
+            <button name="" id="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>*@
+    </div>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            <a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+            <a class="btn btn-primary radius" data-title="添加问题详情" onclick="member_add('添加问题详情', '/admin/Question/AddQuestion', '480', '220')" href="javascript:;"><i class="Hui-iconfont">&#xe600;</i> 添加问题详情</a>
+        </span>
+        <span class="r">共有数据：<strong>@ViewBag.Count</strong> 条</span>
+    </div>
+    <div class="mt-20">
+        <table id="tab" class="table table-border table-bordered table-bg table-hover table-sort table-responsive">
+            <thead>
+                <tr class="text-c">
+                    <th width="25"><input type="checkbox" name="" value=""></th>
+                    <th style="display:none;">Id</th>
+                    <th>问卷名称</th>
+                    <th>问题内容</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in ViewBag.Data)
+                    {
+                        <tr class="text-c">
+                            <td><input type="checkbox" value="" name=""></td>
+                            <td style="display:none;" class="Id">@item.Id</td>
+                            <td>@item.Questionnaire.QuestionnaireName</td>
+                            <td>@item.Context</td>
+                            <td class="f-14 td-manage"><a style="text-decoration:none" class="ml-5" onClick="member_Updata('修改问题信息', '/admin/Question/UpdataQuestion?id=@item.Id&question=@item.Questionnaire.QuestionnaireName&questionId=@item.Questionnaire.Id&content=@item.Context', '480', '220', this)" href="javascript:;" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a> <a style="text-decoration:none" class="ml-5" onClick="article_del(this)" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a></td>
+                        </tr>
+                    }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="~/H-ui/lib/My97DatePicker/4.8/WdatePicker.js"></script>
+    <script type="text/javascript" src="~/H-ui/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="~/H-ui/lib/laypage/1.2/laypage.js"></script>
+    <script type="text/javascript">
+        $('.table-sort').dataTable({
+            "aaSorting": [[1, "desc"]],//默认第几个排序
+            "bStateSave": true,//状态保存
+            "pading": false,
+            "aoColumnDefs": [
+              //{"bVisible": false, "aTargets": [ 3 ]} //控制列的隐藏显示
+              { "orderable": false, "aTargets": [0, 2] }// 不参与排序的列
+            ]
+        });
+
+function article_del(obj){
+
+        var query = confirm("确认要删除该问题详情信息吗？");
+        if (query) {
+            var Id = $(obj).parent().parent().find("td").eq(1).text();
+            GetDelete(Id);
+        }
+}
+
+//批量删除
+function datadel()
+{
+    var id = "";
+    var count = 0;
+    var tab = $("#tab").find("tbody").find("tr").each(function (index, value) {
+        if ($(value).find("td").first().find("input").is(':checked')) {
+            id += $(value).find("td").eq(1).text() + ",";
+            count++;
+        }
+    });
+    id = id.substr(0, id.length - 1);
+    layer.confirm('确定要删除选中的这【' + count + '】条数据吗？', function (index) {
+        GetDelete(id);
+    });
+}
+
+function GetDelete(id)
+{
+    $.get("/admin/Question/DeleteQuestion", { Id: id.toString() }, function (data) {
+            if (data.success) {
+                layer.msg("删除成功！", {
+                    icon: 1
+                }, setTimeout(function () {
+                    location.reload();
+                }, 1000))
+            }
+            else
+            {
+                layer.msg("删除失败！", {
+                    icon: 2
+                }, setTimeout(function () {
+                    location.reload();
+                }, 1000))
+            }
+        }, "json")
+}
+/*添加问题详情*/
+function member_add(title, url, w, h) {
+    layer_show(title, url, w, h);
+}
+
+function member_Updata(title, url, w, h, obj) {
+    layer_show(title, url, w, h);
+}
+    </script>
+}

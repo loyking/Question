@@ -1,0 +1,56 @@
+﻿
+@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "Updatadepatment";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<Depart> DepartName = work.Repository<Depart>().GetList().ToList();
+}
+
+<div class="page-container">
+    <form action="" method="post" class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;部门名称：</label>
+            <div class="formControls col-xs-6 col-sm-1">
+                <input type="text" class="input-text" value="@ViewBag.Depart.DepartName" placeholder="请输入部门名称" id="DepartName" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-6 col-sm-2 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="btnSava()"*@ id="btnUpdata" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 修改</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        $("#btnUpdata").click(function () {
+            var Id=@ViewBag.Id;
+            var name = $("#DepartName").val();
+            if (name=="") {
+                layer.msg("部门名称不能为空！");
+            }
+            else{
+                $.post("/admin/department/Updatadepatment", ({id:Id, DepartName: name }),
+                   function (data) {
+                       if (data.success) {
+                           layer.msg("修改成功！", { icon: 1 }, { icon: 1 }, setTimeout(function () {
+                               parent.location.reload();
+                           }, 2000))
+                       } else {
+                           layer.msg("修改失败", { icon: 2, time: 2000 });
+                       }
+                   }, "json")
+            }
+            })
+    })
+    </script>
+}
+
+
+
+

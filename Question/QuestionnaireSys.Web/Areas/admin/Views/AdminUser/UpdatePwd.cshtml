@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewBag.Title = "UpdatePwd";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-container">
+    <form id="addForm" action="" method="post" class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">新密码：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="password" class="input-text" value="" placeholder="请输入您的新密码" id="pwd" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">确认密码：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="password" class="input-text" value="" placeholder="请再次输入您的新密码" id="pwds" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="btnSava()"*@ id="btnUpdate" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 修改</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#btnUpdate").click(function () {
+            var id = @ViewBag.Id;
+            var pwd = $.trim($("#pwd").val());
+            var pwds = $.trim($("#pwds").val());
+            if(pwd==""){
+                layer.msg("密码不能为空！");
+            }
+            else if(pwd.length<6){
+                layer.msg("密码长度不能少于6位！");
+            }
+            else if(pwd!=pwds){
+                layer.msg("两次密码请输入一致！");
+            }
+            else{
+                $.post("/admin/AdminUser/UpdatePwd",{id:id,pwd:pwd},function(data){
+                    if(data.success){
+                        layer.msg(data.message, { icon: 1 }, setTimeout(function () {
+                            parent.location.reload();
+                        }, 500))
+                    }
+                    else{
+                        layer.msg(data.message, { icon: 2, time: 500 });
+                    }
+
+                },"json")
+            }
+    })
+    })
+</script>

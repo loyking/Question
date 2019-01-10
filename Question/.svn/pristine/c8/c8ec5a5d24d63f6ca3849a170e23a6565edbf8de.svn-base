@@ -1,0 +1,121 @@
+﻿@using QuestionnaireSys.Web.Models;
+@using QuestionnaireSys.Model;
+@using QuestionnaireSys.DAL;
+@{
+    Layout = null;
+    LoginUser user= QuestionnaireSys.Web.Tools.Tools.GetLoginUserByTicket(User.Identity);
+    if (user == null || user != null && user.UserType != "student")
+    {
+        Response.Redirect("/Login/Login");
+    }
+    else
+    {
+        UnitOfWork work = new UnitOfWork();
+        dynamic dy = user.User as dynamic;
+        int id = dy.Id;
+        ViewBag.Count = work.Repository<StudentAnswer>().GetCount(p => p.StudentId == id && p.Submit == true);  //该用户已完成的问卷总数
+    }
+    string loginUserType = user == null ? "" : user.UserType;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>学员问卷系统</title>
+    <link rel="stylesheet" href="~/Script/Bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/Script/Bootstrap/bootstrap-table.min.css" />
+    <style type="text/css">
+        body { background-color:#DCEFFE;}
+        .footer {
+            text-align:center;
+            color: #777;
+            border-top: 1px solid #e5e5e5;
+            padding-top:10px;
+        }
+        #headline {
+            font-size:16px;
+        }
+        #btn>span { background-color:#DCEFFE; }
+
+        .ButtomSolid { border-bottom:3px solid red;}
+        .nav > li > a:hover { cursor:pointer; background-color:#DCEFFE;}
+
+          #Main {
+            border:1px dashed #777777;
+            border-radius:1%;
+            width:100%;
+            height:550px;
+            margin:0px auto;
+            background-color:white;
+        }
+        #Main h3 { text-align:center; line-height:550px; color:#a94442;}
+        #container img {  text-align:center; width:93%;}
+        #box { position:relative; z-index:100; top:-100px; }
+        #userInfo { border:1px solid red; width:175px; height:100px; text-align:center; margin-bottom:10px; border-radius:3%; background-color:#EBC4A5; box-shadow:0px 0px  10px 5px #EAF0F9; }
+    </style>
+    @RenderSection("link",false)
+</head>
+<body>
+    <nav class="navbar navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button id="btn" type="button" style="background-color:#f8f8f8;" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a id="head" class="navbar-brand" href="/">青鸟学员问卷调查系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul id="barUl" class="nav navbar-nav navbar-right">
+                    <li class="ButtomSolid"><a href="/">首页</a></li>
+                    <li><a href="/MyQuestionnaire">我的问卷<span class="sr-only">(current)</span></a></li>
+                    <li><a href="/MySuggest">我的建议</a></li>
+                    <li id="loginff"><a>退出</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container" id="container">
+        <img src="~/Uploads/indexbackgroundImg.jpg" />
+        <div id="box">
+            <br />
+            <div id="userInfo">
+                <h4>@User.Identity.Name ，你好！</h4>
+                <h6>你已经完成 @ViewBag.Count 套问卷</h6>
+            </div>
+            <div id="Main">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    
+
+    <footer class="footer">
+        <p>&copy;  2004 - 2018 湖南青鸟科教集团 版权所有. </p>
+    </footer>
+
+    <script type="text/javascript" src="/Script/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/Script/Bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Script/Bootstrap/bootstrap-table.js"></script>
+    <script type="text/javascript" src="~/Script/Bootstrap/bootstrap-table-zh-CN.min.js"></script>
+
+    <script type="text/javascript" src="~/H-ui/lib/layer/2.4/layer.js"></script>
+    @RenderSection("script", false)
+    <script type="text/javascript">
+        $("#loginff").click(function () {
+            layer.confirm('你确定退出吗？', {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                location.href = "/Login/Logoff";
+            });
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+﻿@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "UpdataAdminUser";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<AdminUser> AdminUser = work.Repository<AdminUser>().GetList().ToList();
+    List<Depart> Depart = work.Repository<Depart>().GetList().ToList();
+    List<UserRole> Role = work.Repository<UserRole>().GetList().ToList();
+}
+<div class="page-container">
+    <form action="" method="post" class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;账号：</label>
+            <div class="formControls col-xs-6 col-sm-2">
+                <input type="text" class="input-text" value="@ViewBag.Classe.LoginName" placeholder="请输入账号" id="LoginName" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;密码：</label>
+            <div class="formControls col-xs-6 col-sm-2">
+                <input type="password" class="input-text" value="@ViewBag.Classe.LoginPwd" placeholder="请输入密码" id="LoginPwd" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;用户名：</label>
+            <div class="formControls col-xs-6 col-sm-2">
+                <input type="text" class="input-text" value="@ViewBag.Classe.UserName" placeholder="请输入用户名" id="UserName" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;部门：</label>
+            <div class="formControls col-xs-6 col-sm-2">
+                <span class="select-box">
+                    <select name="" id="DepartId" class="select">
+                        @foreach (var item in Depart)
+                        {
+                            <option value="@item.Id">@item.DepartName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">&emsp;角色：</label>
+            <div class="formControls col-xs-6 col-sm-2">
+                <span class="select-box">
+                    <select name="" id="UserRoleId" class="select">
+                        @foreach (var item in Role)
+                        {
+                            <option value="@item.Id">@item.RoleName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="btnSava()"*@ id="btnUpdata" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+    $(function () {
+        $("#btnUpdata").click(function () {
+            var Id=@ViewBag.Id;
+            var loginName = $("#LoginName").val();
+            var loginPwd = $("#LoginPwd").val();
+            var userName = $("#UserName").val();
+            var departId = $("#DepartId").val();
+            var userRoleId = $("#UserRoleId").val();
+            if (loginName == "" || userName == "" || loginPwd == "") {
+                layer.msg("管理员信息不能为空！");
+            }
+            else{
+                $.post("/admin/AdminUser/UpdataAdminuser", ({Id:Id, LoginName: loginName, LoginPwd: loginPwd, UserName: userName, DepartId: departId, UserRoleId: userRoleId }),
+                    function (data) {
+                    if (data.success) {
+                        layer.msg("修改成功！", { icon: 1 }, { icon: 1 }, setTimeout(function () {
+                            parent.location.reload();
+                        }, 2000))
+                    } else {
+                        layer.msg("修改失败", { icon: 2, time: 2000 });
+                    }
+                }, "json")
+            }
+        })
+    })
+    </script>
+}

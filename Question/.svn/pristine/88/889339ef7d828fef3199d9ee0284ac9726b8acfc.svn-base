@@ -1,0 +1,84 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>问卷调查登陆</title>
+    <script src="~/Script/jquery-1.10.2.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    <style type="text/css">
+        body { background-color:#B9D0D6; background-position:center; background-repeat:no-repeat; background-image:url("/Uploads/LoginbackgroundImg.jpeg")}
+        #main { border:1px solid red; border-radius:2%; box-shadow:0px 0px  10px 5px #EAF0F9;
+min-height:200px; position:relative; top:150px;}
+        #footer { text-align:center; margin-top:200px; font-size:18px; color:white;}
+        #main h2 { color:white;}
+        #LoginPwd { margin-top:5px;}
+    </style>
+</head>
+<body>
+
+    
+
+
+    <div class="container" id="main">
+        <h2 class="form-signin-heading text-center">青鸟学员问卷调查系统</h2>
+        <form class="form-signin">
+            <input type="text" id="LoginName" class="form-control" placeholder="账号" />
+            <input type="password" id="LoginPwd" class="form-control" placeholder="密码" />
+            <button id="Login" class="btn btn-lg btn-primary btn-block" type="button">登录</button>
+        </form>
+    </div>
+    <div id="footer">
+        <p>&copy;  2004 - 2018 湖南青鸟科教集团 版权所有. </p>
+    </div>
+
+
+    <script type="text/javascript" src="~/Script/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/H-ui/lib/layer/2.4/layer.js"></script>
+    <script type="text/javascript">
+        var ii;
+        $(function () {
+            $(document).ajaxStart(function () {
+                ii = layer.load();
+            })
+
+            $(document).ajaxStop(function () {
+                layer.close(ii);
+            })
+
+
+            $("#Login").click(function () {
+                if ($("#LoginName").val() != "" && $("#LoginPwd").val() != "") {
+                    $.post("/Login/Login",
+                     { LoginName: $("#LoginName").val(), LoginPwd: $("#LoginPwd").val() },
+                     function (data) {
+                         if (data.success) {
+                             location.href = data.Url;
+                         } else {
+
+                             layer.alert(data.message, {
+                                 icon: 2,
+                                 time: 2000
+                             });
+                         }
+                     }, "json");
+                }
+                    else
+                {
+                    layer.alert("账号密码不允许为空", {
+                        icon: 2,
+                        time: 2000
+                    })
+                }
+            })
+
+        })
+    </script>
+</body>
+</html>

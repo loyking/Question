@@ -1,0 +1,101 @@
+﻿@using QuestionnaireSys.Web.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@section link{
+    <style type="text/css">
+        #table {
+            width: 99%;
+            margin: 0px auto;
+            margin-top: 5px;
+        }
+
+        .QuestionInfoBox > span {
+            display: inline-block;
+            padding: 15px 0px;
+            width: 180px;
+            text-align: center;
+        }
+
+        .QuestionTitle {
+            font-weight: bold;
+        }
+
+        .QuestionInfoBox > span:first-child {
+            display: none;
+        }
+    </style>
+}
+
+@if (ViewBag.QuestionInfo != null)
+{
+    <table id="table" class="table table-bordered table-condensed table-striped table-hover">
+        <thead>
+            <tr>
+                <th>已完成的问卷信息</th>
+            </tr>
+            <tr>
+                <th>
+                    <div class="QuestionInfoBox QuestionTitle">
+                        <span>问卷ID</span>
+                        <span>问卷类型名称</span>
+                        <span>问卷名称</span>
+                        <span>问卷发表者名字</span>
+                        <span>问卷时间</span>
+                        <span>问卷状态</span>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (QuestionInfo Question in ViewBag.QuestionInfo)
+            {
+
+                <tr>
+                    <td>
+                        <div class="QuestionInfoBox">
+                            <span></span>
+                            <span>@Question.QuestionnaireTypeName</span>
+                            <span>@Question.QuestionnaireName</span>
+                            <span>@Question.UserName</span>
+                            <span>@Question.CreateDate</span>
+                            <span class="QuestionState">@Question.state</span>
+                            <span><a href="/MyQuestionnaire/AnswerDetail?QuestionId=@Question.Id&QuestionName=@Question.QuestionnaireName"><input type="button" value="查看" class="btn btn-primary" /></a></span>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3>暂无已完成的调查问卷！</h3>
+}
+
+
+@section script{
+    @*<script type="text/javascript" src="~/Script/jquery-1.10.2.min.js"></script>*@
+    <script type="text/javascript">
+        $(function () {
+
+            $("#table").bootstrapTable({
+                pagination: true,
+                pageNumber:1,
+                pageSize: 5,
+                pageList: [10, 30, 50],
+                search: true
+            });
+
+            $("#navbar ul li").removeClass("ButtomSolid");
+            $("#navbar ul li:eq(1)").attr("class", "ButtomSolid");
+            
+        })
+
+
+    </script>
+}

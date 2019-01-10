@@ -1,0 +1,118 @@
+﻿@using QuestionnaireSys.DAL
+@using QuestionnaireSys.Model
+@{
+    ViewBag.Title = "AddQuestionnairesInfo";
+    Layout = "~/Areas/admin/Views/Shared/_Layout.cshtml";
+    UnitOfWork work = new UnitOfWork();
+    List<Classe> Classe = work.Repository<Classe>().GetList().ToList();
+    List<AdminUser> AdminUser = work.Repository<AdminUser>().GetList().ToList();
+    List<QuestionnaireType> QuestionnaireType = work.Repository<QuestionnaireType>().GetList().ToList();
+    List<Questionnaire> Questionnaire = work.Repository<Questionnaire>().GetList().ToList();
+}
+
+<title>添加问卷信息</title>
+<div class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-article-add">
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">班级：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select name="" id="select1" class="select">
+                        @foreach (var item in Classe)
+                        {
+                            <option value="@item.Id">@item.ClasseName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        @*<div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">所属管理者：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select id="select2" class="select">
+                        @foreach (var item in AdminUser)
+                        {
+                            <option value="@item.Id">@item.UserName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>*@
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">问卷名称：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="请输入问卷名称" id="name" name="">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">问卷类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <span class="select-box">
+                    <select id="select3" class="select">
+                        @foreach (var item in QuestionnaireType)
+                        {
+                            <option value="@item.Id">@item.QuestionnaireName</option>
+                        }
+                    </select>
+                </span>
+            </div>
+        </div>
+        @*<div class="row cl">
+            <label class="form-label col-xs-3 col-sm-2">解决方案：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" value="" placeholder="请输入解决方案" id="solution" name="">
+            </div>
+        </div>*@
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-2">
+                <button @*onClick="article_save();"*@ id="btnSava" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存</button>
+                <button onClick="layer_close();" class="btn btn-default radius" type="button">&nbsp;&nbsp;取消&nbsp;&nbsp;</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section scripts{
+    <script src="~/Areas/admin/Script/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+
+
+        $("#btnSava").click(function () {
+            //var classId = $("#select1").find("option").eq($("#select1").first().val() - 1).val();
+            var classId = $("#select1").val();
+            //alert(classId);
+            //var adminId = $("#select2").find("option").eq($("#select2").first().val() - 1).val();
+            //var adminId = $("#select2").val();
+            //alert(adminId);
+            var name = $.trim($("#name").val());
+            //var typeName = $("#select3").find("option").eq($("#select3").first().val() - 1).val();
+            var typeName = $("#select3").val();
+            //alert(typeName);
+            var solution = $("#solution").val();
+            //alert(classId);
+            if (name == "") {
+                layer.msg("问卷名称不能为空！");
+            }
+            else {
+                $.post("/admin/QuestionnairesInfo/AddQuestionnaire", ({ classId: classId, questionnaireName: name, questionnareTypeId: typeName}), function (data) {
+                    if (data.success) {
+                        //alert(data.message);
+                        layer.msg(data.message, { icon: 1 }, setTimeout(function () {
+                            //location = location;
+                            parent.location.reload();
+                        }, 500))
+                    }
+                    else {
+                        layer.msg(data.message, { icon: 2 }, setTimeout(function () {
+                            //location = location;
+                            //parent.location.reload();
+                        }, 500))
+                    }
+                }, "json")
+            }
+        })
+    })
+
+    </script>
+}
